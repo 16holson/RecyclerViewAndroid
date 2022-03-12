@@ -1,3 +1,12 @@
 <resources>
-    <string name="app_name">CS3270A8</string>
+    <string name="app_name">CS3270A7Olson</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="id">ID</string>
+    <string name="name">Name</string>
+    <string name="course_code">Course Code</string>
+    <string name="course_edit">Course Edit</string>
+    <string name="new_course">New Course</string>
+    <string name="save">Save</string>
+    <string name="show_database">Show Database</string>
 </resources>
