@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -16,6 +15,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,7 @@ public class CourseListFragment extends Fragment implements CourseRecyclerAdapte
 
     private View root;
     private onClickCourse mCallBack;
+    private FloatingActionButton addBtn;
 
     public CourseListFragment()
     {
@@ -108,6 +110,18 @@ public class CourseListFragment extends Fragment implements CourseRecyclerAdapte
     public void onResume()
     {
         super.onResume();
+
+        addBtn = root.findViewById(R.id.addBtn);
+
+        addBtn.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                AddCourseDialog dialog = new AddCourseDialog();
+                dialog.show(getParentFragmentManager(), "addDialog");
+            }
+        });
 
         RecyclerView rv = root.findViewById(R.id.recycler);
         CourseRecyclerAdapter adapter = new CourseRecyclerAdapter(new ArrayList<Courses>(), this);

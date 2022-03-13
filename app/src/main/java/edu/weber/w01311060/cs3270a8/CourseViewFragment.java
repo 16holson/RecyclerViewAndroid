@@ -1,5 +1,6 @@
 package edu.weber.w01311060.cs3270a8;
 
+import android.app.Activity;
 import android.bluetooth.le.ScanSettings;
 import android.os.Bundle;
 
@@ -17,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import edu.weber.w01311060.cs3270a8.models.Courses;
 
@@ -38,10 +40,32 @@ public class CourseViewFragment extends Fragment
     private String mParam2;
 
     private View root;
+    private TextView idInfo, nameInfo, courseCodeInfo, startAtInfo, endAtInfo;
+    private onCourseViewListener mCallBack;
+    private Courses course;
 
     public CourseViewFragment()
     {
         // Required empty public constructor
+    }
+    public interface onCourseViewListener
+    {
+        void onCourseViewClick(Courses course, CourseEditFragment edit);
+        void onDeleteClick(Courses course, DeleteCourseDialog delete);
+    }
+
+    @Override
+    public void onAttach(@NonNull Activity activity)
+    {
+        super.onAttach(activity);
+        try
+        {
+            mCallBack = (CourseViewFragment.onCourseViewListener) activity;
+        }
+        catch (ClassCastException e)
+        {
+            throw new ClassCastException(activity.toString() + "must implement onCourseViewListener");
+        }
     }
 
     /**
@@ -87,6 +111,17 @@ public class CourseViewFragment extends Fragment
     }
 
     @Override
+    public void onResume()
+    {
+        super.onResume();
+        idInfo = root.findViewById(R.id.idInfo);
+        nameInfo = root.findViewById(R.id.nameInfo);
+        courseCodeInfo = root.findViewById(R.id.courseCodeInfo);
+        startAtInfo = root.findViewById(R.id.startAtInfo);
+        endAtInfo = root.findViewById(R.id.endAtInfo);
+    }
+
+    @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater)
     {
         inflater.inflate(R.menu.courseview, menu);
@@ -99,12 +134,15 @@ public class CourseViewFragment extends Fragment
         switch (item.getItemId())
         {
             case R.id.edit:
-                //TODO:go to main and set the fragment to the edit fragment
-                Log.d("ViewFrag", "pressed edit");
+                CourseEditFragment dialog = new CourseEditFragment();
+                dialog.show(getParentFragmentManager(), "editDialog");
+                mCallBack.onCourseViewClick(course, dialog);
                 return true;
             case R.id.delete:
-                //TODO:show dialog and if they pick ok then delete from database
-                Log.d("ViewFrag", "pressed delete");
+                DeleteCourseDialog deleteDialog = new DeleteCourseDialog();
+                deleteDialog.setCancelable(false);
+                deleteDialog.show(getParentFragmentManager(), "deleteDialog");
+                mCallBack.onDeleteClick(course, deleteDialog);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -120,6 +158,16 @@ public class CourseViewFragment extends Fragment
 
     public void showCourse(Courses course)
     {
-        Log.d("ViewFrag", "course: " + course);
+        this.course = course;
+        setCourseText();
+    }
+
+    public void setCourseText()
+    {
+        idInfo.setText(course.getId());
+        nameInfo.setText(course.getName());
+        courseCodeInfo.setText(course.getCourseCode());
+        startAtInfo.setText(course.getStartAt());
+        endAtInfo.setText(course.getEndAt());
     }
 }

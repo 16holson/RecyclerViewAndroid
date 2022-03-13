@@ -15,4 +15,7 @@
     <string name="course_codeview">Course Code:</string>
     <string name="start_atview">Start At:</string>
     <string name="end_atview">End At:</string>
+    <string name="name_required">Name(Required)</string>
+    <string name="start_at">Start At</string>
+    <string name="end_at">End At</string>
 </resources>

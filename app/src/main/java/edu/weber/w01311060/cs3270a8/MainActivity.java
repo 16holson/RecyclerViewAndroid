@@ -19,7 +19,7 @@ import edu.weber.w01311060.cs3270a8.db.AppDatabase;
 import edu.weber.w01311060.cs3270a8.db.CourseDAO;
 import edu.weber.w01311060.cs3270a8.models.Courses;
 
-public class MainActivity extends AppCompatActivity implements CourseListFragment.onClickCourse
+public class MainActivity extends AppCompatActivity implements CourseListFragment.onClickCourse, CourseViewFragment.onCourseViewListener, CourseEditFragment.onSaveCourse, DeleteCourseDialog.onDeleteListener
 {
     private CourseViewFragment cv;
     private FragmentManager fm;
@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity implements CourseListFragmen
                 .replace(R.id.fragmentContainerView, new CourseViewFragment(), "CourseViewFragment")
                 .addToBackStack(null)
                 .commit();
-                //.commitNow();
         fm.executePendingTransactions();
         if(cv == null)
         {
@@ -59,5 +58,39 @@ public class MainActivity extends AppCompatActivity implements CourseListFragmen
             cv.showCourse(course);
         }
 
+    }
+
+    @Override
+    public void onCourseViewClick(Courses course, CourseEditFragment edit)
+    {
+        //I'm pretty sure I shouldn't be doing this
+        edit.saveCourse(course);
+    }
+
+    @Override
+    public void onDeleteClick(Courses course, DeleteCourseDialog delete)
+    {
+        delete.setCourse(course);
+    }
+
+    @Override
+    public void reloadCourse()
+    {
+        if(cv == null)
+        {
+            cv = (CourseViewFragment) fm.findFragmentByTag("CourseViewFragment");
+        }
+        if(cv != null)
+        {
+            cv.setCourseText();
+        }
+    }
+
+    @Override
+    public void onReload()
+    {
+        fm.beginTransaction()
+                .replace(R.id.fragmentContainerView, new CourseListFragment(), "CourseListFragment")
+                .commit();
     }
 }
