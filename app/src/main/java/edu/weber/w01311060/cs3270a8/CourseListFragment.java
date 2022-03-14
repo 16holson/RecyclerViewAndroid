@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -51,7 +52,7 @@ public class CourseListFragment extends Fragment implements CourseRecyclerAdapte
 
     public interface onClickCourse
     {
-        void updateCourse(Courses course);
+        void updateCourse(Courses course, CourseViewFragment cv);
     }
 
     @Override
@@ -151,6 +152,9 @@ public class CourseListFragment extends Fragment implements CourseRecyclerAdapte
     @Override
     public void onCourseClick(Courses course)
     {
-        mCallBack.updateCourse(course);
+        FragmentTransaction ft = getParentFragmentManager().beginTransaction();
+        CourseViewFragment dialog = new CourseViewFragment();
+        dialog.show(ft, "CourseViewFragment");
+        mCallBack.updateCourse(course, dialog);
     }
 }

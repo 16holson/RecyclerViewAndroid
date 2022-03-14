@@ -2,12 +2,15 @@ package edu.weber.w01311060.cs3270a8;
 
 import android.app.Activity;
 import android.bluetooth.le.ScanSettings;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -20,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import edu.weber.w01311060.cs3270a8.db.AppDatabase;
 import edu.weber.w01311060.cs3270a8.models.Courses;
 
 /**
@@ -27,7 +31,7 @@ import edu.weber.w01311060.cs3270a8.models.Courses;
  * Use the {@link CourseViewFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CourseViewFragment extends Fragment
+public class CourseViewFragment extends DialogFragment
 {
 
     // TODO: Rename parameter arguments, choose names that match
@@ -96,6 +100,7 @@ public class CourseViewFragment extends Fragment
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        setStyle(DialogFragment.STYLE_NORMAL, R.style.AppTheme_Dialog_FullScreen);
         setHasOptionsMenu(true);
     }
 
@@ -104,21 +109,68 @@ public class CourseViewFragment extends Fragment
     {
         super.onViewCreated(view, savedInstanceState);
 
+        requireDialog().getWindow().setWindowAnimations(R.style.AppTheme_DialogAnimation);
+
         Toolbar toolbar = root.findViewById(R.id.toolbar);
         toolbar.setTitle("View Course");
+        toolbar.setNavigationIcon(R.drawable.ic_baseline_close_24);
+
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                dismiss();
+            }
+        });
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor prefEdit = prefs.edit();
+        prefEdit.putString("id", idInfo.getText().toString());
+        prefEdit.putString("name", nameInfo.getText().toString());
+        prefEdit.putString("coursecode", courseCodeInfo.getText().toString());
+        prefEdit.putString("startat", startAtInfo.getText().toString());
+        prefEdit.putString("endat", endAtInfo.getText().toString());
+        prefEdit.commit();
     }
 
     @Override
     public void onResume()
     {
         super.onResume();
+        SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
         idInfo = root.findViewById(R.id.idInfo);
         nameInfo = root.findViewById(R.id.nameInfo);
         courseCodeInfo = root.findViewById(R.id.courseCodeInfo);
         startAtInfo = root.findViewById(R.id.startAtInfo);
         endAtInfo = root.findViewById(R.id.endAtInfo);
+        if(course != null)
+        {
+            setCourseText();
+        }
+        else
+        {
+            Log.d("ViewFrag", "id: " + prefs.getString("id", ""));
+            new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    course = AppDatabase.getInstance(getContext())
+                            .getCourseDao()
+                            .findCourseByCourseId(prefs.getString("id", ""));
+                    setCourseText();
+                }
+            }).start();
+        }
+
     }
 
     @Override
@@ -159,7 +211,6 @@ public class CourseViewFragment extends Fragment
     public void showCourse(Courses course)
     {
         this.course = course;
-        setCourseText();
     }
 
     public void setCourseText()

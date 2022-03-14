@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.LiveData;
 import androidx.room.Room;
 
+import android.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -21,7 +22,7 @@ import edu.weber.w01311060.cs3270a8.models.Courses;
 
 public class MainActivity extends AppCompatActivity implements CourseListFragment.onClickCourse, CourseViewFragment.onCourseViewListener, CourseEditFragment.onSaveCourse, DeleteCourseDialog.onDeleteListener
 {
-    private CourseViewFragment cv;
+    private CourseViewFragment cvf;
     private FragmentManager fm;
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -41,23 +42,10 @@ public class MainActivity extends AppCompatActivity implements CourseListFragmen
     }
 
     @Override
-    public void updateCourse(Courses course)
+    public void updateCourse(Courses course, CourseViewFragment cv)
     {
-        //change fragment to CourseViewFragment and send the course
-        fm.beginTransaction()
-                .replace(R.id.fragmentContainerView, new CourseViewFragment(), "CourseViewFragment")
-                .addToBackStack(null)
-                .commit();
-        fm.executePendingTransactions();
-        if(cv == null)
-        {
-            cv = (CourseViewFragment) fm.findFragmentByTag("CourseViewFragment");
-        }
-        if(cv != null)
-        {
-            cv.showCourse(course);
-        }
-
+          cvf = cv;
+          cv.showCourse(course);
     }
 
     @Override
@@ -76,21 +64,12 @@ public class MainActivity extends AppCompatActivity implements CourseListFragmen
     @Override
     public void reloadCourse()
     {
-        if(cv == null)
-        {
-            cv = (CourseViewFragment) fm.findFragmentByTag("CourseViewFragment");
-        }
-        if(cv != null)
-        {
-            cv.setCourseText();
-        }
+        cvf.setCourseText();
     }
 
     @Override
     public void onReload()
     {
-        fm.beginTransaction()
-                .replace(R.id.fragmentContainerView, new CourseListFragment(), "CourseListFragment")
-                .commit();
+        cvf.dismiss();
     }
 }
